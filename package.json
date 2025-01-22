@@ -1,0 +1,12 @@
+{
+  "name": "offline-chat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/frontend"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "workspaces": ["packages/frontend"]
+}
