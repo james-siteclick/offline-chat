@@ -1,4 +1,5 @@
 // Import the framework and instantiate it
+import { drizzle } from "drizzle-orm/node-postgres";
 import Fastify from "fastify";
 
 import { makeValidator, ValidationError } from "./utils/validator";
@@ -7,9 +8,17 @@ import { PutChatRoomBody } from "./dto/put-chat-room";
 
 import makeCreateChatRoom from "./domain/use-cases/create-chat-room";
 import makeGetChatRoom from "./domain/use-cases/get-chat-rooms";
+import makeChatRoomRepository from "./repository/chat-room-repository";
 
+// @todo put database connection string in config
+const db = drizzle("postgres://chat:password@127.0.0.1:5432/chat");
+
+// Repositories
+const chatRoomRepository = makeChatRoomRepository(db);
+
+// Use cases
 const getChatRoom = makeGetChatRoom();
-const createChatRoom = makeCreateChatRoom();
+const createChatRoom = makeCreateChatRoom(chatRoomRepository);
 
 const fastify = Fastify({
   logger: true,
@@ -28,10 +37,11 @@ fastify.put("/chat-rooms", async function handler(request, reply) {
 
 fastify.setErrorHandler((err, request, reply) => {
   if (err instanceof ValidationError) {
-    console.error("Validation error", err);
+    console.info("Validation error", err);
     return reply.status(400).send({ message: "Bad Request" });
   }
-  throw err;
+  console.error(err);
+  return reply.status(500).send({ message: "Internal Server Error" });
 });
 
 try {

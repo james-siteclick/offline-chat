@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run dev --workspace=packages/frontend && npm run dev --workspace=packages/backend"
+    "start:backend": "npm run dev --workspace=packages/backend",
+    "start:frontend": "npm run dev --workspace=packages/frontend",
+    "dev": "npm run start:backend && npm run start:frontend",
+    "migrate:up": "npm run migrate:up --workspace=packages/backend"
   },
   "author": "",
   "license": "ISC",
