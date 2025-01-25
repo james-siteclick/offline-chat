@@ -6,6 +6,7 @@ import { makeValidator, ValidationError } from "./utils/validator";
 
 import { PutChatRoomBody } from "./dto/put-chat-room";
 
+import { ConflictError } from "./domain/interfaces/error";
 import makeCreateChatRoom from "./domain/use-cases/create-chat-room";
 import makeGetChatRoom from "./domain/use-cases/get-chat-rooms";
 import makeChatRoomRepository from "./repository/chat-room-repository";
@@ -39,6 +40,10 @@ fastify.setErrorHandler((err, request, reply) => {
   if (err instanceof ValidationError) {
     console.info("Validation error", err);
     return reply.status(400).send({ message: "Bad Request" });
+  }
+  if (err instanceof ConflictError) {
+    console.info("Conflict error", err);
+    return reply.status(409).send({ message: "Conflict" });
   }
   console.error(err);
   return reply.status(500).send({ message: "Internal Server Error" });
