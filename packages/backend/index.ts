@@ -1,12 +1,16 @@
 // Import the framework and instantiate it
 import Fastify from "fastify";
+
+import makeGetChatRoom from "./domain/use-cases/get-chat-rooms";
+const getChatRoom = makeGetChatRoom();
+
 const fastify = Fastify({
   logger: true,
 });
 
 // Declare a route
-fastify.get("/", async function handler(request, reply) {
-  return { hello: "world" };
+fastify.get("/chat-rooms", async function handler(request, reply) {
+  return getChatRoom();
 });
 
 // Run the server!
