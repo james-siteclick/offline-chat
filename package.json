@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run dev --workspace=packages/frontend"
+    "dev": "npm run dev --workspace=packages/frontend && npm run dev --workspace=packages/backend"
   },
   "author": "",
   "license": "ISC",
   "description": "",
-  "workspaces": ["packages/frontend"]
+  "workspaces": [
+    "packages/frontend",
+    "packages/backend"
+  ]
 }
