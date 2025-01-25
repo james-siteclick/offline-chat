@@ -3,7 +3,7 @@ import { ChatRoom } from "../models/chat-room";
 export type GetChatRooms = () => Promise<ChatRoom[]>;
 
 export default function makeGetChatRoom(): GetChatRooms {
-  return function getChatRooms() {
+  return async function getChatRooms() {
     const data: ChatRoom[] = [
       {
         id: "0c5c0ee1-3f82-41b1-93ab-5acec8f0b2a7",
@@ -22,6 +22,6 @@ export default function makeGetChatRoom(): GetChatRooms {
       },
     ];
 
-    return Promise.resolve(data);
+    return data;
   };
 }
