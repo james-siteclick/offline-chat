@@ -4,11 +4,10 @@ import Fastify from "fastify";
 
 import { makeValidator, ValidationError } from "./utils/validator";
 
-import { PutChatRoomBody } from "./dto/put-chat-room";
-
 import { ConflictError } from "./domain/interfaces/error";
-import makeCreateChatRoom from "./domain/use-cases/create-chat-room";
-import makeGetChatRoom from "./domain/use-cases/get-chat-rooms";
+import makeGetChatRooms from "./domain/use-cases/get-chat-rooms";
+import makeUpsertChatRoom from "./domain/use-cases/upsert-chat-room";
+import { PutChatRoomBody } from "./dto/put-chat-room";
 import makeChatRoomRepository from "./repository/chat-room-repository";
 
 // @todo put database connection string in config
@@ -18,8 +17,8 @@ const db = drizzle("postgres://chat:password@127.0.0.1:5432/chat");
 const chatRoomRepository = makeChatRoomRepository(db);
 
 // Use cases
-const getChatRoom = makeGetChatRoom();
-const createChatRoom = makeCreateChatRoom(chatRoomRepository);
+const getChatRooms = makeGetChatRooms(chatRoomRepository);
+const upsertChatRoom = makeUpsertChatRoom(chatRoomRepository);
 
 const fastify = Fastify({
   logger: true,
@@ -27,12 +26,12 @@ const fastify = Fastify({
 
 // Declare a route
 fastify.get("/chat-rooms", async function handler(request, reply) {
-  return getChatRoom();
+  return getChatRooms();
 });
 
 fastify.put("/chat-rooms", async function handler(request, reply) {
   const data = makeValidator(PutChatRoomBody)(request.body);
-  const result = await createChatRoom(data);
+  const result = await upsertChatRoom(data);
   return reply.status(200).send(result);
 });
 

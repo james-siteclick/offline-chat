@@ -1,3 +1,3 @@
-import { CreateChatRoomRequest } from "../domain/use-cases/create-chat-room";
+import { UpsertChatRoomRequest } from "../domain/use-cases/upsert-chat-room";
 
-export const PutChatRoomBody = CreateChatRoomRequest;
+export const PutChatRoomBody = UpsertChatRoomRequest;
