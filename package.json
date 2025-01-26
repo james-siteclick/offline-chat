@@ -2,6 +2,7 @@
   "name": "offline-chat",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start:backend": "npm run dev --workspace=packages/backend",
     "start:frontend": "npm run dev --workspace=packages/frontend",
@@ -13,8 +14,7 @@
   "license": "ISC",
   "description": "",
   "workspaces": [
-    "packages/frontend",
-    "packages/backend"
+    "packages/*"
   ],
   "devDependencies": {
     "vitest": "^3.0.4"

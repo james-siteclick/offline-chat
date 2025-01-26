@@ -8,19 +8,24 @@ export function reducer<T extends MutableRecord>(
   const appliedMutations: Mutation<T>[] = [];
 
   mutations.forEach((mutation) => {
-    if (mutation.type === "CREATE") {
-      if (!nextState.has(mutation.data.id)) {
-        nextState.set(mutation.data.id, mutation.data);
-        appliedMutations.push(mutation);
-      } else {
-        logDroppedMutation(nextState, mutation);
-      }
-    }
-    if (mutation.type === "DELETE" && isDeletable(nextState, mutation)) {
-      nextState.delete(mutation.data.id);
-      appliedMutations.push(mutation);
-    } else {
-      logDroppedMutation(nextState, mutation);
+    switch (mutation.type) {
+      case "CREATE":
+        if (!initialState.has(mutation.data.id)) {
+          nextState.set(mutation.data.id, mutation.data);
+          appliedMutations.push(mutation);
+        } else {
+          return logDroppedMutation(initialState, mutation);
+        }
+        break;
+
+      case "DELETE":
+        if (isDeletable(initialState, mutation)) {
+          nextState.set(mutation.data.id, mutation.data);
+          appliedMutations.push(mutation);
+        } else {
+          return logDroppedMutation(initialState, mutation);
+        }
+        break;
     }
   });
 

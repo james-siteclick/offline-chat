@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "@offline-chat/backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx index.ts",
@@ -17,9 +17,16 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.8",
     "@types/node": "^22.10.7",
     "drizzle-kit": "^0.30.2",
     "tsx": "^4.19.2"
   },
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
 }
