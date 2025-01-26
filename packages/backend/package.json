@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx index.ts",
-    "migrate:up": "npx drizzle-kit generate && npx drizzle-kit up"
+    "migrate:up": "npx drizzle-kit generate && npx drizzle-kit push"
   },
   "author": "",
   "license": "ISC",

@@ -28,7 +28,7 @@ export default function makeChatRoomRepository(
       .select()
       .from(chatRoomsTable)
       .where(eq(chatRoomsTable.id, id));
-    return ChatRoom.parse(pruneNull(chatRoom));
+    return chatRoom ? ChatRoom.parse(pruneNull(chatRoom)) : undefined;
   }
 
   async function update(
@@ -47,8 +47,6 @@ export default function makeChatRoomRepository(
       .from(chatRoomsTable)
       .where(isNull(chatRoomsTable.deleted_at));
 
-    console.log(results);
-    console.log(results.map(pruneNull));
     return ChatRoom.array().parse(results.map(pruneNull));
   }
 
