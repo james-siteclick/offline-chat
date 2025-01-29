@@ -1,115 +1,79 @@
-import { ChatRoom } from "@offline-chat/backend";
-import { v4 as uuidv4 } from "uuid";
+import { createChatRoom, getChatRooms, HttpError } from "../data/api";
+import { useChatRoomsStore } from "../store/chat-rooms";
+import { getLastUpdatedAt, merge } from "../store/merge";
+import { getMaxDate } from "../utils/date";
+import AddChatRoomForm from "./AddChatRoomForm";
 
-import { useState, useSyncExternalStore } from "react";
-import * as api from "../data/api";
-import { HttpError } from "../data/api";
-import { StoreEventType, StoreSubscriber } from "../store/interfaces/events";
-import { Store } from "../store/store";
-
-const apiSubscriber: StoreSubscriber<ChatRoom> = async (event) => {
-  switch (event.type) {
-    case StoreEventType.init:
-      const chatRooms = await api.getChatRooms();
-      event.store.setState(
-        new Map(chatRooms.map((chatRoom) => [chatRoom.id, chatRoom]))
-      );
-      break;
-
-    case StoreEventType.enqueueMutation:
-      if (event.mutation.type === "CREATE") {
-        try {
-          await api.createChatRoom(event.mutation.data);
-        } catch (err) {
-          // Already exists
-          if (err instanceof HttpError && err.statusCode === 409) {
-            event.store.deleteMutation(event.mutation);
-            return window.alert("Chat room already exists");
-          }
-          throw err;
-        }
-      }
-      break;
-  }
-};
-
-const store = new Store<ChatRoom>();
-
-export default function Index() {
-  const chatRooms = useSyncExternalStore(
-    (callback) => store.subscribe(callback),
-    () => store.getViewState()
-  );
-
-  const chatRoomsList = Array.from(chatRooms.values());
-
-  return (
-    <div>
-      <h1>Main page</h1>
-
-      <OfflineSwitch />
-
-      <button type="submit" className="btn btn-primary" onClick={handleClick}>
-        Add Chat Room
-      </button>
-      {chatRoomsList.map((chatRoom) => (
-        <li key={chatRoom.id}>
-          {chatRoom.id} {chatRoom.name}
-        </li>
-      ))}
-    </div>
-  );
-}
-
-function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-  event.preventDefault();
-  const newRoom: ChatRoom = {
-    id: uuidv4(),
-    name: window.prompt(`Chat room name`) ?? "(Untitled)",
-    created_at: new Date(),
-  };
-  store.enqueueMutation({
-    type: "CREATE",
-    data: newRoom,
+async function fullSync() {
+  const chatRooms = await getChatRooms();
+  const state = useChatRoomsStore.getState();
+  useChatRoomsStore.setState({
+    ...state,
+    lastSync: new Date(),
+    mutationQueue: [],
+    chatRooms: chatRooms,
   });
 }
 
-function OfflineSwitch() {
-  const [isOnline, setIsOnline] = useState(false);
+async function incrementalSync() {
+  const state = useChatRoomsStore.getState();
 
-  if (isOnline && !store.isSubscribed(apiSubscriber)) {
-    console.log("Online mode");
-    store.subscribe(apiSubscriber);
-  }
-  if (!isOnline && store.isSubscribed(apiSubscriber)) {
-    console.log("Offline mode");
-    store.unsubscribe(apiSubscriber);
-  }
-  return (
-    <Switch
-      label="Offline mode"
-      onChange={(isOffline) => setIsOnline(!isOffline)}
-    />
-  );
+  // Push local mutations
+  const promises = [...state.mutationQueue]
+    .map((id) => state.chatRooms.find((chatRoom) => chatRoom.id === id))
+    .filter((chatRoom) => chatRoom !== undefined)
+    .map(async (chatRoom) => {
+      try {
+        await createChatRoom(chatRoom);
+        const { mutationQueue, ...rest } = useChatRoomsStore.getState();
+        useChatRoomsStore.setState({
+          ...rest,
+          mutationQueue: mutationQueue.filter((item) => item !== chatRoom.id),
+        });
+      } catch (err) {
+        console.error(err);
+        // If local state conflicts with DB state, do a full sync
+        if (err instanceof HttpError && err.statusCode === 409) {
+          return fullSync();
+        }
+      }
+    });
+
+  // Get remote mutations
+  const lastSyncDate = getMaxDate(state.chatRooms.map(getLastUpdatedAt));
+  const getRemoteMutations = getChatRooms(lastSyncDate).then((chatRooms) => {
+    const state = useChatRoomsStore.getState();
+
+    console.log("Getting remote mutations since...", lastSyncDate, chatRooms);
+    useChatRoomsStore.setState({
+      ...state,
+      lastSync: new Date(),
+      chatRooms: merge(state.chatRooms, chatRooms),
+    });
+  });
+
+  await Promise.all([...promises, getRemoteMutations]);
+
+  window.setTimeout(incrementalSync, 5000);
 }
 
-type OnChangeHandler = (isChecked: boolean) => void;
-type SwitchProps = {
-  label: string;
-  onChange: OnChangeHandler;
-};
-function Switch({ label, onChange }: SwitchProps) {
+incrementalSync();
+fullSync();
+
+export default function Index() {
+  const chatRoomsStore = useChatRoomsStore();
+
   return (
-    <div className="form-check form-switch">
-      <input
-        className="form-check-input"
-        type="checkbox"
-        id="flexSwitchCheckDefault"
-        onChange={(evt) => onChange(evt.target.checked)}
-      />
-      <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-        {label}
-      </label>
+    <div>
+      <h1>Chat</h1>
+
+      <ul className="list-unstyled p-1">
+        {chatRoomsStore.chatRooms.map((chatRoom) => (
+          <li key={chatRoom.id}># {chatRoom.name}</li>
+        ))}
+      </ul>
+
+      <AddChatRoomForm onSubmit={chatRoomsStore.addChatRoom} />
     </div>
   );
 }

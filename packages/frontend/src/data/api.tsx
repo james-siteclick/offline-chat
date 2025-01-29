@@ -8,8 +8,15 @@ export class HttpError extends Error {
   }
 }
 
-export async function getChatRooms() {
-  const response = await fetch(`${baseUrl}/chat-rooms`);
+export async function getChatRooms(since?: Date) {
+  console.log(since, typeof since);
+  const params = since
+    ? new URLSearchParams({
+        since: since.toISOString(),
+      })
+    : new URLSearchParams();
+
+  const response = await fetch(`${baseUrl}/chat-rooms?${params.toString()}`);
   if (response.ok) {
     const data = await response.json();
     return ChatRoom.array().parse(data);
