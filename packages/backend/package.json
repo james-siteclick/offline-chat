@@ -2,10 +2,12 @@
   "name": "@offline-chat/backend",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx index.ts",
-    "migrate:up": "npx drizzle-kit generate && npx drizzle-kit push"
+    "migrate:up": "npx drizzle-kit generate && npx drizzle-kit push",
+    "build": "npx tsc"
   },
   "author": "",
   "license": "ISC",
@@ -22,7 +24,6 @@
     "drizzle-kit": "^0.30.2",
     "tsx": "^4.19.2"
   },
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

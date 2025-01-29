@@ -1,9 +1,16 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
-  "include": ["domain/models/**/*"],
+  // "include": ["domain/models/**/*"],
   "compilerOptions": {
-    "outDir": "dist",
+    "noEmit": false,
+    "outDir": "./dist",
     "declaration": true,
-    "declarationMap": true
-  }
+    "declarationMap": true,
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "files": ["domain/models/index.ts"]
 }

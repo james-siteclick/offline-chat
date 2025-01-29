@@ -5,7 +5,9 @@ import Fastify from "fastify";
 import { makeValidator, ValidationError } from "./utils/validator";
 
 import { ConflictError } from "./domain/interfaces/error";
-import makeGetChatRooms from "./domain/use-cases/get-chat-rooms";
+import makeGetChatRooms, {
+  GetChatRoomsQuery,
+} from "./domain/use-cases/get-chat-rooms";
 import makeUpsertChatRoom from "./domain/use-cases/upsert-chat-room";
 import { PutChatRoomBody } from "./dto/put-chat-room";
 import makeChatRoomRepository from "./repository/chat-room-repository";
@@ -26,7 +28,9 @@ const fastify = Fastify({
 
 // Declare a route
 fastify.get("/chat-rooms", async function handler(request, reply) {
-  return getChatRooms();
+  const query = GetChatRoomsQuery.parse(request.query);
+  console.log(query);
+  return getChatRooms(query);
 });
 
 fastify.put("/chat-rooms", async function handler(request, reply) {

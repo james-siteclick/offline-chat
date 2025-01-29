@@ -1,4 +1,4 @@
-import { eq, isNull } from "drizzle-orm";
+import { eq, gte, or, SQL } from "drizzle-orm";
 import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
 import { ChatRoomRepository } from "../domain/interfaces/chat-room-repository";
 import { ConflictError } from "../domain/interfaces/error";
@@ -41,11 +41,20 @@ export default function makeChatRoomRepository(
       .where(eq(chatRoomsTable.id, id));
   }
 
-  async function getAll() {
+  async function getAll(since?: Date) {
+    const filters: SQL[] = [];
+
+    const date = since ?? new Date(0);
+
     const results = await db
       .select()
       .from(chatRoomsTable)
-      .where(isNull(chatRoomsTable.deleted_at));
+      .where(
+        or(
+          gte(chatRoomsTable.created_at, date),
+          gte(chatRoomsTable.deleted_at, date)
+        )
+      );
 
     return ChatRoom.array().parse(results.map(pruneNull));
   }

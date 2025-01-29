@@ -10,5 +10,5 @@ export interface ChatRoomRepository {
     update: Partial<Omit<ChatRoom, "id">>
   ): Promise<void>;
 
-  getAll(): Promise<ChatRoom[]>;
+  getAll(since?: Date): Promise<ChatRoom[]>;
 }

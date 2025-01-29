@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ChatRoom } from "./chat-room";
-import { User } from "./user";
+import { ChatRoom } from "./chat-room.js";
+import { User } from "./user.js";
 
 export const Message = z.object({
   id: z.string().uuid(),
