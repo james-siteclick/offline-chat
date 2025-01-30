@@ -5,7 +5,6 @@ import { persist } from "zustand/middleware";
 import { makeLocalStorage } from "./json-local-storage";
 
 interface ChatRoomsState {
-  lastSync?: Date;
   chatRooms: ChatRoom[];
   mutationQueue: ChatRoom["id"][];
   addChatRoom: (name: string) => void;

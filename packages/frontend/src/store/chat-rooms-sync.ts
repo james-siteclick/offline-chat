@@ -10,7 +10,6 @@ export async function fullSync() {
   const state = useChatRoomsStore.getState();
   useChatRoomsStore.setState({
     ...state,
-    lastSync: new Date(),
     mutationQueue: [],
     chatRooms: chatRooms,
   });
@@ -54,7 +53,6 @@ export async function incrementalSync() {
     console.log("Getting remote mutations since...", lastSyncDate, chatRooms);
     useChatRoomsStore.setState({
       ...state,
-      lastSync: new Date(),
       chatRooms: merge(state.chatRooms, chatRooms),
     });
   });
