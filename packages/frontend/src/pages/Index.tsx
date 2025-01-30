@@ -17,6 +17,15 @@ export default function Index() {
     navigate("/login");
   }
 
+  const visibleChatRooms = chatRoomsStore.chatRooms
+    .filter((chatRoom) => !chatRoom.deleted_at)
+    .sort((a, b) => {
+      if (a.name === b.name) {
+        return 0;
+      }
+      return a.name > b.name ? 1 : -1;
+    });
+
   return (
     <div>
       <NavBar />
@@ -25,10 +34,17 @@ export default function Index() {
         <div className="row align-items-start">
           <div className="col-3 p-3" style={{ background: "#e9ecef" }}>
             <ul className="list-unstyled">
-              {chatRoomsStore.chatRooms.map((chatRoom) => (
+              {visibleChatRooms.map((chatRoom) => (
                 <li key={chatRoom.id}>
-                  <a href="#" className="text-decoration-none">
-                    # {chatRoom.name}
+                  # {chatRoom.name} {chatRoom?.deleted_at?.toISOString()}
+                  <a
+                    href="#"
+                    className="text-decoration-none"
+                    style={{ float: "right" }}
+                    title={`Delete ${chatRoom.name}`}
+                    onClick={() => chatRoomsStore.deleteChatRoom(chatRoom.id)}
+                  >
+                    ×
                   </a>
                 </li>
               ))}
