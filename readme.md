@@ -4,13 +4,20 @@ This is an attempt at making an offline-first web app.
 
 The backend uses Node.js and Fastify, with Drizzle ORM and Postgres.
 
-The frontend uses React with Zustand. State is persisted in LocalStorage, and a background sync identifies state that needs updating from the backend. This can be observed by running 2 windows concurrently and adding/removing chat rooms.
+The frontend uses Vite, React and Zustand for state management. State is persisted in LocalStorage, and a background sync identifies state that needs updating from the backend. This can be observed by running 2 windows concurrently and adding/removing chat rooms.
 
 Yet to be implemented:
 
 - Messages
 - Proper authentication (a JWT token is obtained, but this is not added in HTTP requests or verified in the backend)
 - Clearing all local storage state on logout
+
+Working:
+
+- Login
+- Logout
+- Add Chat Room with background syncing
+- Delete Chat Room with background syncing
 
 ## 1. Clone the repository
 
@@ -42,7 +49,7 @@ Ensure this remains running in a separate terminal window.
 ```shell
 npm i
 npm run build
-npm run migrate
+npm run migrate:up
 ```
 
 ## 5. Running the app
@@ -56,6 +63,8 @@ npm run start:backend
 ```shell
 npm run start:frontend
 ```
+
+The frontend task will output a web URL on localhost in the browser.
 
 Log in with either:
 
