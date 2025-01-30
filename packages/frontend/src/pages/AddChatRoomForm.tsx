@@ -18,15 +18,18 @@ export default function AddChatRoomForm({ onSubmit }: AddChatRoomFormProps) {
         reset();
       })}
     >
-      <label>
-        Chat room name
+      <div className="mb-3">
+        <label className="form-label" htmlFor="name">
+          Chat room name
+        </label>
         <input
           className="form-control"
           type="text"
           id="name"
           {...register("name")}
         />
-      </label>
+      </div>
+
       <button type="submit" className="btn btn-primary">
         Add Chat Room
       </button>

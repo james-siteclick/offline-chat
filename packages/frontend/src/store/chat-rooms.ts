@@ -12,17 +12,6 @@ interface ChatRoomsState {
   clearMutation: (id: string) => void;
 }
 
-function addChatRoom(chatRooms: ChatRoom[], id: string, newChatRoom: string) {
-  return [
-    ...chatRooms,
-    {
-      id,
-      created_at: new Date(),
-      name: newChatRoom,
-    },
-  ];
-}
-
 export const useChatRoomsStore = create<ChatRoomsState>()(
   persist(
     (set) => ({
@@ -31,9 +20,7 @@ export const useChatRoomsStore = create<ChatRoomsState>()(
       clearMutation(id: string) {
         set((state) => ({
           ...state,
-          mutationQueue: this.mutationQueue.filter(
-            (existingId) => existingId !== id
-          ),
+          mutationQueue: clearMutation(state.mutationQueue, id),
         }));
       },
       addChatRoom(name: string) {
@@ -42,7 +29,6 @@ export const useChatRoomsStore = create<ChatRoomsState>()(
           return {
             ...state,
             chatRooms: addChatRoom(state.chatRooms, id, name),
-            newChatRoom: "",
             mutationQueue: [...state.mutationQueue, id],
           };
         });
@@ -54,3 +40,18 @@ export const useChatRoomsStore = create<ChatRoomsState>()(
     }
   )
 );
+
+function addChatRoom(chatRooms: ChatRoom[], id: string, newChatRoom: string) {
+  return [
+    ...chatRooms,
+    {
+      id,
+      created_at: new Date(),
+      name: newChatRoom,
+    },
+  ];
+}
+
+function clearMutation(mutationQueue: string[], id: string): string[] {
+  return mutationQueue.filter((existingId) => existingId !== id);
+}

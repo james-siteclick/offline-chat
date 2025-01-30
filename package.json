@@ -6,6 +6,7 @@
   "scripts": {
     "start:backend": "npm run dev --workspace=packages/backend",
     "start:frontend": "npm run dev --workspace=packages/frontend",
+    "build": "npm run build --workspace=packages/backend",
     "start": "npm run start:backend && npm run start:frontend",
     "migrate:up": "npm run migrate:up --workspace=packages/backend",
     "test": "npx vitest"

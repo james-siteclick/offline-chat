@@ -1,4 +1,7 @@
-import { createChatRoom, getChatRooms, HttpError } from "../data/api";
+import { useNavigate } from "react-router";
+import { createChatRoom, getChatRooms } from "../data/chat-rooms";
+import { HttpError } from "../data/utils/http-error";
+import { useAppStore } from "../store/app";
 import { useChatRoomsStore } from "../store/chat-rooms";
 import { getLastUpdatedAt, merge } from "../store/merge";
 import { getMaxDate } from "../utils/date";
@@ -62,18 +65,52 @@ fullSync();
 
 export default function Index() {
   const chatRoomsStore = useChatRoomsStore();
+  const appStore = useAppStore();
+  const navigate = useNavigate();
+
+  if (!appStore.user) {
+    navigate("/login");
+  }
 
   return (
     <div>
-      <h1>Chat</h1>
+      <NavBar />
 
-      <ul className="list-unstyled p-1">
-        {chatRoomsStore.chatRooms.map((chatRoom) => (
-          <li key={chatRoom.id}># {chatRoom.name}</li>
-        ))}
-      </ul>
+      <div className="container-fluid">
+        <div className="row align-items-start">
+          <div className="col-3 p-3" style={{ background: "#e9ecef" }}>
+            <ul className="list-unstyled">
+              {chatRoomsStore.chatRooms.map((chatRoom) => (
+                <li key={chatRoom.id}>
+                  <a href="#" className="text-decoration-none">
+                    # {chatRoom.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <AddChatRoomForm onSubmit={chatRoomsStore.addChatRoom} />
+          </div>
 
-      <AddChatRoomForm onSubmit={chatRoomsStore.addChatRoom} />
+          <div className="col-9 p-3">hello</div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function NavBar() {
+  const appStore = useAppStore();
+  return (
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <div className="container-fluid">
+        <span className="navbar-brand">Chat</span>
+        <div className="d-flex">Logged in as {appStore.user?.username}</div>
+        <div className="d-flex">
+          <a href="#" onClick={() => appStore.logout()}>
+            Logout
+          </a>
+        </div>
+      </div>
+    </nav>
   );
 }
